@@ -19,6 +19,8 @@ public class ListController {
     static HashMap<String, String> columnChoices = new HashMap<>();
 
     public ListController () {
+
+        //provide a centralized collection of the different list and search options presented throughout the user interface
         columnChoices.put("core competency", "Skill");
         columnChoices.put("employer", "Employer");
         columnChoices.put("location", "Location");
@@ -51,15 +53,20 @@ public class ListController {
         }
 
     }
+    @RequestMapping(value = "results")
+    public String search(Model model, @RequestParam String searchType, @RequestParam String searchTerm) {
 
-    @RequestMapping(value = "jobs")
-    public String listJobsByColumnAndValue(Model model,
-            @RequestParam String column, @RequestParam String value) {
+        ArrayList<HashMap<String, String>> jobs;
 
-        ArrayList<HashMap<String, String>> jobs = JobData.findByColumnAndValue(column, value);
-        model.addAttribute("title", "Jobs with " + columnChoices.get(column) + ": " + value);
+        if (searchType.equals("all") || searchType.equals("")) {
+            jobs = JobData.findByValue(searchType);
+        } else {
+            jobs = JobData.findByColumnAndValue(searchType, searchTerm);
+        }
+
+        model.addAttribute("columns", ListController.columnChoices);
         model.addAttribute("jobs", jobs);
 
-        return "list-jobs";
+        return "search";
     }
 }
